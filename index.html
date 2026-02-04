@@ -1,0 +1,388 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Calculadora de Funil — Mentoria D-Valor</title>
+
+  <style>
+    :root{
+      /* Cores base (mantendo a estética do print) */
+      --bg: #0F0815;
+      --panel: #140B1F;
+      --panel2:#1B1028;
+      --stroke: rgba(255,255,255,.10);
+      --text: #F4F1FF;
+      --muted:#CFC6EA;
+
+      --brand: #8D0EB7;
+      --brand2:#B01AE2;
+      --track: rgba(255,255,255,.16);
+
+      --ok: #BFF3CF;
+      --okText: #0C2A16;
+
+      --shadow: 0 18px 40px rgba(0,0,0,.35);
+      --radius: 16px;
+    }
+
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, "Helvetica Neue";
+      background: radial-gradient(900px 600px at 20% 10%, rgba(141,14,183,.25), transparent 60%),
+                  radial-gradient(800px 500px at 80% 20%, rgba(176,26,226,.18), transparent 55%),
+                  var(--bg);
+      color:var(--text);
+    }
+
+    .wrap{
+      max-width: 1100px;
+      margin: 24px auto;
+      padding: 0 16px 40px;
+    }
+
+    .topbar{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      margin-bottom:14px;
+    }
+
+    .tabs{
+      display:flex;
+      background: rgba(255,255,255,.06);
+      border:1px solid var(--stroke);
+      border-radius: 14px;
+      overflow:hidden;
+      box-shadow: var(--shadow);
+    }
+    .tab{
+      appearance:none;
+      border:0;
+      padding: 12px 18px;
+      color:var(--text);
+      background:transparent;
+      cursor:pointer;
+      font-weight:700;
+      letter-spacing:.2px;
+      min-width:120px;
+    }
+    .tab.active{
+      background: linear-gradient(180deg, rgba(141,14,183,.85), rgba(141,14,183,.55));
+    }
+
+    .logo{
+      display:flex;
+      align-items:center;
+      justify-content:flex-end;
+      gap:10px;
+      min-width: 180px;
+    }
+    .logo img{
+      height: 46px;
+      width:auto;
+      display:block;
+      filter: drop-shadow(0 10px 20px rgba(0,0,0,.35));
+    }
+
+    .grid{
+      display:grid;
+      grid-template-columns: 1.05fr .95fr;
+      gap:18px;
+    }
+
+    .card{
+      background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
+      border: 1px solid var(--stroke);
+      border-radius: var(--radius);
+      padding: 18px;
+      box-shadow: var(--shadow);
+    }
+
+    .title{
+      font-size: 18px;
+      font-weight: 800;
+      margin: 0 0 10px;
+      letter-spacing:.2px;
+    }
+    .subtitle{
+      margin: 0 0 18px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.35;
+    }
+
+    .row{
+      margin: 14px 0;
+      padding: 12px 12px;
+      border-radius: 14px;
+      background: rgba(0,0,0,.14);
+      border:1px solid rgba(255,255,255,.06);
+    }
+    .rowTop{
+      display:flex;
+      align-items:flex-end;
+      justify-content:space-between;
+      gap:12px;
+      margin-bottom: 10px;
+    }
+    .label{
+      font-weight: 800;
+      font-size: 13px;
+    }
+    .val{
+      font-variant-numeric: tabular-nums;
+      font-weight: 900;
+      font-size: 13px;
+      color: #fff;
+      opacity:.95;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.08);
+      border:1px solid rgba(255,255,255,.08);
+      white-space:nowrap;
+    }
+
+    input[type="range"]{
+      width:100%;
+      accent-color: var(--brand);
+      cursor:pointer;
+    }
+
+    .resultsHeader{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      margin-bottom: 10px;
+    }
+    .resultsHeader h2{
+      margin:0;
+      font-size: 18px;
+      font-weight: 900;
+      letter-spacing:.25px;
+    }
+
+    .kpi{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:12px;
+      padding: 14px 14px;
+      border-radius: var(--radius);
+      border: 1px solid var(--stroke);
+      background: rgba(255,255,255,.05);
+      margin: 12px 0;
+    }
+    .kpi strong{
+      font-size: 13px;
+      letter-spacing:.2px;
+    }
+    .kpi .num{
+      font-variant-numeric: tabular-nums;
+      font-weight: 950;
+      font-size: 16px;
+    }
+
+    .kpi.ok{
+      background: var(--ok);
+      border-color: rgba(0,0,0,.08);
+      color: var(--okText);
+    }
+
+    .tiny{
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.35;
+      margin-top: 10px;
+      opacity:.95;
+    }
+
+    .pill{
+      display:inline-block;
+      padding: 6px 10px;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.06);
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .footerNote{
+      margin-top: 10px;
+      font-size: 12px;
+      color: rgba(255,255,255,.72);
+      line-height: 1.4;
+    }
+
+    @media (max-width: 920px){
+      .grid{ grid-template-columns: 1fr; }
+      .logo{ min-width:auto; }
+      .logo img{ height: 42px; }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="wrap">
+
+    <div class="topbar">
+      <div class="tabs" role="tablist" aria-label="Modo">
+        <button class="tab active" id="tabPadrao" type="button">Padrão</button>
+        <button class="tab" id="tabVideo" type="button">Vídeo</button>
+      </div>
+
+      <div class="logo" aria-label="Logo">
+        <img src="logodvalor.png" alt="D-Valor Group" />
+      </div>
+    </div>
+
+    <div class="grid">
+      <!-- CONTROLES (somente o que está no print) -->
+      <section class="card">
+        <h1 class="title">Calculadora de Funil</h1>
+        <p class="subtitle">
+          Ajuste as barrinhas. O faturamento recalcula automaticamente.
+        </p>
+
+        <div class="row">
+          <div class="rowTop">
+            <div class="label">N° de clientes ideal</div>
+            <div class="val" id="vClientes">10</div>
+          </div>
+          <input id="clientes" type="range" min="0" max="200" step="1" value="10">
+        </div>
+
+        <div class="row">
+          <div class="rowTop">
+            <div class="label">Taxa agendamento</div>
+            <div class="val" id="vAg">10%</div>
+          </div>
+          <input id="ag" type="range" min="0" max="100" step="1" value="10">
+        </div>
+
+        <div class="row">
+          <div class="rowTop">
+            <div class="label">Taxa de Comparecimento</div>
+            <div class="val" id="vShow">50%</div>
+          </div>
+          <input id="show" type="range" min="0" max="100" step="1" value="50">
+        </div>
+
+        <div class="row">
+          <div class="rowTop">
+            <div class="label">Taxa de conversão</div>
+            <div class="val" id="vConv">30%</div>
+          </div>
+          <input id="conv" type="range" min="0" max="100" step="1" value="30">
+        </div>
+
+        <div class="row">
+          <div class="rowTop">
+            <div class="label">Ticket médio</div>
+            <div class="val" id="vTicket">R$ 2.000,00</div>
+          </div>
+          <input id="ticket" type="range" min="100" max="50000" step="100" value="2000">
+        </div>
+
+        <div class="tiny">
+          <span class="pill">Modo Vídeo</span>
+          <div class="footerNote">
+            No modo “Vídeo” (aba acima), você pode simular taxas diferentes sem mudar o layout.
+            (A lógica continua igual.)
+          </div>
+        </div>
+      </section>
+
+      <!-- RESULTADOS (somente Faturamento) -->
+      <aside class="card">
+        <div class="resultsHeader">
+          <h2>RESULTADO MENSAL</h2>
+        </div>
+
+        <div class="kpi ok">
+          <strong>Faturamento</strong>
+          <div class="num" id="rFat">R$ 0,00</div>
+        </div>
+
+        <div class="tiny" style="margin-top:12px;">
+          <div class="footerNote">
+            O faturamento é calculado com base no número de clientes ideal e no ticket médio.
+          </div>
+        </div>
+      </aside>
+    </div>
+  </div>
+
+  <script>
+    const $ = (id) => document.getElementById(id);
+
+    // Abas (só visual)
+    const tabPadrao = $("tabPadrao");
+    const tabVideo  = $("tabVideo");
+    tabPadrao.addEventListener("click", () => {
+      tabPadrao.classList.add("active");
+      tabVideo.classList.remove("active");
+    });
+    tabVideo.addEventListener("click", () => {
+      tabVideo.classList.add("active");
+      tabPadrao.classList.remove("active");
+    });
+
+    function fmtBRL(n){
+      const v = Math.max(0, Number(n) || 0);
+      return v.toLocaleString("pt-BR", { style:"currency", currency:"BRL" });
+    }
+    function fmtInt(n){
+      return (Math.round(Number(n) || 0)).toLocaleString("pt-BR");
+    }
+    function fmtPct(n){
+      return `${Math.round(Number(n) || 0)}%`;
+    }
+
+    function read(){
+      return {
+        clientes: Number($("clientes").value),
+        ag:       Number($("ag").value),
+        show:     Number($("show").value),
+        conv:     Number($("conv").value),
+        ticket:   Number($("ticket").value)
+      };
+    }
+
+    function renderInputs(s){
+      $("vClientes").textContent = fmtInt(s.clientes);
+      $("vAg").textContent       = fmtPct(s.ag);
+      $("vShow").textContent     = fmtPct(s.show);
+      $("vConv").textContent     = fmtPct(s.conv);
+      $("vTicket").textContent   = fmtBRL(s.ticket);
+    }
+
+    function calc(s){
+      // Mantendo simples: faturamento = clientes ideal * ticket médio
+      // (taxas ficam como parâmetros visuais para simulação, como no print)
+      const fatur = s.clientes * s.ticket;
+      return { fatur };
+    }
+
+    function renderResults(r){
+      $("rFat").textContent = fmtBRL(r.fatur);
+    }
+
+    function update(){
+      const s = read();
+      renderInputs(s);
+      const r = calc(s);
+      renderResults(r);
+    }
+
+    ["clientes","ag","show","conv","ticket"].forEach(id => {
+      $(id).addEventListener("input", update);
+    });
+
+    update();
+  </script>
+</body>
+</html>
