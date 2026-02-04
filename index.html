@@ -8,11 +8,14 @@
   <style>
     :root{
       --bg: #0F0815;
+      --panel: #140B1F;
+      --panel2:#1B1028;
       --stroke: rgba(255,255,255,.10);
       --text: #F4F1FF;
       --muted:#CFC6EA;
 
       --brand: #8D0EB7;
+      --brand2:#B01AE2;
       --track: rgba(255,255,255,.16);
 
       --ok: #BFF3CF;
@@ -42,7 +45,16 @@
       display:flex;
       align-items:center;
       justify-content:flex-end;
+      gap:12px;
       margin-bottom:14px;
+    }
+
+    .logo{
+      display:flex;
+      align-items:center;
+      justify-content:flex-end;
+      gap:10px;
+      min-width: 180px;
     }
     .logo img{
       height: 46px;
@@ -106,17 +118,24 @@
       border-radius: 999px;
       background: rgba(255,255,255,.08);
       border:1px solid rgba(255,255,255,.08);
-      white-space: nowrap;
+      white-space:nowrap;
     }
 
     input[type="range"]{
       width:100%;
-      cursor:pointer;
       accent-color: var(--brand);
+      cursor:pointer;
     }
 
+    .resultsHeader{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      margin-bottom: 10px;
+    }
     .resultsHeader h2{
-      margin:0 0 10px;
+      margin:0;
       font-size: 18px;
       font-weight: 900;
       letter-spacing:.25px;
@@ -149,8 +168,24 @@
       color: var(--okText);
     }
 
+    .tiny{
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.35;
+      margin-top: 10px;
+      opacity:.95;
+    }
+
+    .footerNote{
+      margin-top: 10px;
+      font-size: 12px;
+      color: rgba(255,255,255,.72);
+      line-height: 1.4;
+    }
+
     @media (max-width: 920px){
       .grid{ grid-template-columns: 1fr; }
+      .logo{ min-width:auto; }
       .logo img{ height: 42px; }
     }
   </style>
@@ -158,7 +193,6 @@
 
 <body>
   <div class="wrap">
-
     <div class="topbar">
       <div class="logo" aria-label="Logo">
         <img src="logodvalor.png" alt="D-Valor Group" />
@@ -170,28 +204,20 @@
       <section class="card">
         <h1 class="title">Calculadora de Funil</h1>
         <p class="subtitle">
-          Ajuste as barrinhas. O faturamento recalcula automaticamente.
+          Ajuste as barrinhas. O resultado recalcula automaticamente.
         </p>
 
         <div class="row">
           <div class="rowTop">
-            <div class="label">Investimento por mês (R$)</div>
-            <div class="val" id="vInvest">R$ 1.000,00</div>
+            <div class="label">N° de clientes ideal</div>
+            <div class="val" id="vClientes">10</div>
           </div>
-          <input id="invest" type="range" min="0" max="50000" step="100" value="1000">
+          <input id="clientes" type="range" min="0" max="200" step="1" value="10">
         </div>
 
         <div class="row">
           <div class="rowTop">
-            <div class="label">Custo por Lead (R$)</div>
-            <div class="val" id="vCpl">R$ 6,00</div>
-          </div>
-          <input id="cpl" type="range" min="1" max="80" step="1" value="6">
-        </div>
-
-        <div class="row">
-          <div class="rowTop">
-            <div class="label">Taxa de agendamento (%)</div>
+            <div class="label">Taxa agendamento</div>
             <div class="val" id="vAg">10%</div>
           </div>
           <input id="ag" type="range" min="0" max="100" step="1" value="10">
@@ -199,7 +225,7 @@
 
         <div class="row">
           <div class="rowTop">
-            <div class="label">Taxa de comparecimento (%)</div>
+            <div class="label">Taxa de Comparecimento</div>
             <div class="val" id="vShow">50%</div>
           </div>
           <input id="show" type="range" min="0" max="100" step="1" value="50">
@@ -207,7 +233,7 @@
 
         <div class="row">
           <div class="rowTop">
-            <div class="label">Taxa de conversão (%)</div>
+            <div class="label">Taxa de conversão</div>
             <div class="val" id="vConv">30%</div>
           </div>
           <input id="conv" type="range" min="0" max="100" step="1" value="30">
@@ -215,14 +241,20 @@
 
         <div class="row">
           <div class="rowTop">
-            <div class="label">Ticket médio (R$)</div>
+            <div class="label">Ticket médio</div>
             <div class="val" id="vTicket">R$ 2.000,00</div>
           </div>
-          <input id="ticket" type="range" min="100" max="20000" step="100" value="2000">
+          <input id="ticket" type="range" min="100" max="50000" step="100" value="2000">
+        </div>
+
+        <div class="tiny">
+          <div class="footerNote">
+            As taxas influenciam o volume necessário no topo do funil para sustentar o número de clientes ideal.
+          </div>
         </div>
       </section>
 
-      <!-- RESULTADO -->
+      <!-- RESULTADOS -->
       <aside class="card">
         <div class="resultsHeader">
           <h2>RESULTADO MENSAL</h2>
@@ -231,6 +263,16 @@
         <div class="kpi ok">
           <strong>Faturamento</strong>
           <div class="num" id="rFat">R$ 0,00</div>
+        </div>
+
+        <!-- extra (discreto) pra você ver o efeito das taxas -->
+        <div class="kpi">
+          <strong>Topo do funil necessário</strong>
+          <div class="num" id="rTopo">0</div>
+        </div>
+
+        <div class="tiny">
+          <div class="footerNote" id="rDetalhes"></div>
         </div>
       </aside>
     </div>
@@ -243,81 +285,78 @@
       const v = Math.max(0, Number(n) || 0);
       return v.toLocaleString("pt-BR", { style:"currency", currency:"BRL" });
     }
+    function fmtInt(n){
+      return (Math.round(Number(n) || 0)).toLocaleString("pt-BR");
+    }
     function fmtPct(n){
       return `${Math.round(Number(n) || 0)}%`;
     }
 
-    function safeSetText(id, value){
-      const el = $(id);
-      if (el) el.textContent = value;
+    function clamp01(x){
+      const n = Number(x) || 0;
+      return Math.max(0, Math.min(1, n));
+    }
+
+    function safeDiv(a, b){
+      const bb = Number(b) || 0;
+      if (bb <= 0) return 0;
+      return (Number(a) || 0) / bb;
     }
 
     function read(){
-      const investEl = $("invest");
-      const cplEl    = $("cpl");
-      const agEl     = $("ag");
-      const showEl   = $("show");
-      const convEl   = $("conv");
-      const ticketEl = $("ticket");
-
       return {
-        invest: investEl ? Number(investEl.value) : 0,
-        cpl:    cplEl    ? Number(cplEl.value)    : 0,
-        ag:     agEl     ? Number(agEl.value)/100 : 0,
-        show:   showEl   ? Number(showEl.value)/100 : 0,
-        conv:   convEl   ? Number(convEl.value)/100 : 0,
-        ticket: ticketEl ? Number(ticketEl.value) : 0,
+        clientes: Number($("clientes").value),
+        ag:       clamp01(Number($("ag").value) / 100),
+        show:     clamp01(Number($("show").value) / 100),
+        conv:     clamp01(Number($("conv").value) / 100),
+        ticket:   Number($("ticket").value)
       };
     }
 
     function renderInputs(s){
-      safeSetText("vInvest", fmtBRL(s.invest));
-      safeSetText("vCpl",    fmtBRL(s.cpl));
-      safeSetText("vAg",     fmtPct(s.ag*100));
-      safeSetText("vShow",   fmtPct(s.show*100));
-      safeSetText("vConv",   fmtPct(s.conv*100));
-      safeSetText("vTicket", fmtBRL(s.ticket));
+      $("vClientes").textContent = fmtInt(s.clientes);
+      $("vAg").textContent       = fmtPct(s.ag * 100);
+      $("vShow").textContent     = fmtPct(s.show * 100);
+      $("vConv").textContent     = fmtPct(s.conv * 100);
+      $("vTicket").textContent   = fmtBRL(s.ticket);
     }
 
     function calc(s){
-      // funil:
-      // leads = invest / cpl
-      // agend = leads * ag
-      // show  = agend * show
-      // vendas= show * conv
-      // fatur = vendas * ticket
-      const leads   = (s.cpl > 0) ? (s.invest / s.cpl) : 0;
-      const agend   = leads * s.ag;
-      const showups = agend * s.show;
-      const vendas  = showups * s.conv;
-      const fatur   = vendas * s.ticket;
-      return { fatur };
+      // Vendas desejadas = clientes ideal
+      const vendas = s.clientes;
+
+      // Calcula o necessário "para trás" no funil
+      const showups      = safeDiv(vendas, s.conv);
+      const agendamentos = safeDiv(showups, s.show);
+      const topo         = safeDiv(agendamentos, s.ag);
+
+      // Faturamento
+      const fatur = vendas * s.ticket;
+
+      return { fatur, topo, agendamentos, showups, vendas };
+    }
+
+    function renderResults(r){
+      $("rFat").textContent  = fmtBRL(r.fatur);
+      $("rTopo").textContent = fmtInt(Math.ceil(r.topo));
+
+      $("rDetalhes").innerHTML =
+        `Agendamentos necessários: <strong>${fmtInt(Math.ceil(r.agendamentos))}</strong><br>` +
+        `Comparecimentos necessários: <strong>${fmtInt(Math.ceil(r.showups))}</strong><br>` +
+        `Vendas (clientes ideal): <strong>${fmtInt(Math.ceil(r.vendas))}</strong>`;
     }
 
     function update(){
-      try{
-        const s = read();
-        renderInputs(s);
-        const r = calc(s);
-        safeSetText("rFat", fmtBRL(r.fatur));
-      }catch(e){
-        // se algo der errado, não “mata” o update silenciosamente
-        console.error("Erro no update:", e);
-      }
+      const s = read();
+      renderInputs(s);
+      const r = calc(s);
+      renderResults(r);
     }
 
-    function bind(id){
-      const el = $(id);
-      if (!el) return;
-      el.addEventListener("input", update, { passive: true });
-      el.addEventListener("change", update, { passive: true });
-      el.addEventListener("touchend", update, { passive: true });
-    }
+    ["clientes","ag","show","conv","ticket"].forEach(id => {
+      $(id).addEventListener("input", update);
+    });
 
-    ["invest","cpl","ag","show","conv","ticket"].forEach(bind);
-
-    // garante que atualiza ao carregar (Safari)
-    document.addEventListener("DOMContentLoaded", update);
     update();
   </script>
 </body>
