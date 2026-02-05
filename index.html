@@ -7,6 +7,7 @@
 
   <style>
     :root{
+      /* Cores base (mantendo a estética do print) */
       --bg: #0F0815;
       --panel: #140B1F;
       --panel2:#1B1028;
@@ -193,6 +194,7 @@
 
 <body>
   <div class="wrap">
+
     <div class="topbar">
       <div class="logo" aria-label="Logo">
         <img src="logodvalor.png" alt="D-Valor Group" />
@@ -204,7 +206,7 @@
       <section class="card">
         <h1 class="title">Calculadora de Funil</h1>
         <p class="subtitle">
-          Ajuste as barrinhas. O resultado recalcula automaticamente.
+          Ajuste as barrinhas. O faturamento recalcula automaticamente.
         </p>
 
         <div class="row">
@@ -212,7 +214,7 @@
             <div class="label">N° de clientes ideal</div>
             <div class="val" id="vClientes">10</div>
           </div>
-          <input id="clientes" type="range" min="0" max="200" step="1" value="10">
+          <input id="clientes" type="range" min="0" max="2000" step="10" value="200">
         </div>
 
         <div class="row">
@@ -248,9 +250,7 @@
         </div>
 
         <div class="tiny">
-          <div class="footerNote">
-            As taxas influenciam o volume necessário no topo do funil para sustentar o número de clientes ideal.
-          </div>
+          <div class="footerNote" id="rDetalhes"></div>
         </div>
       </section>
 
@@ -263,16 +263,6 @@
         <div class="kpi ok">
           <strong>Faturamento</strong>
           <div class="num" id="rFat">R$ 0,00</div>
-        </div>
-
-        <!-- extra (discreto) pra você ver o efeito das taxas -->
-        <div class="kpi">
-          <strong>Topo do funil necessário</strong>
-          <div class="num" id="rTopo">0</div>
-        </div>
-
-        <div class="tiny">
-          <div class="footerNote" id="rDetalhes"></div>
         </div>
       </aside>
     </div>
@@ -292,29 +282,18 @@
       return `${Math.round(Number(n) || 0)}%`;
     }
 
-    function clamp01(x){
-      const n = Number(x) || 0;
-      return Math.max(0, Math.min(1, n));
-    }
-
-    function safeDiv(a, b){
-      const bb = Number(b) || 0;
-      if (bb <= 0) return 0;
-      return (Number(a) || 0) / bb;
-    }
-
     function read(){
       return {
-        clientes: Number($("clientes").value),
-        ag:       clamp01(Number($("ag").value) / 100),
-        show:     clamp01(Number($("show").value) / 100),
-        conv:     clamp01(Number($("conv").value) / 100),
+        prospect: Number($("clientes").value),
+        ag:       Number($("ag").value) / 100,
+        show:     Number($("show").value) / 100,
+        conv:     Number($("conv").value) / 100,
         ticket:   Number($("ticket").value)
       };
     }
 
     function renderInputs(s){
-      $("vClientes").textContent = fmtInt(s.clientes);
+      $("vClientes").textContent = fmtInt(s.prospect);
       $("vAg").textContent       = fmtPct(s.ag * 100);
       $("vShow").textContent     = fmtPct(s.show * 100);
       $("vConv").textContent     = fmtPct(s.conv * 100);
@@ -322,28 +301,24 @@
     }
 
     function calc(s){
-      // Vendas desejadas = clientes ideal
-      const vendas = s.clientes;
+      // Funil:
+      // prospectados -> agendados -> compareceram -> compraram -> faturamento
+      const agendados    = s.prospect * s.ag;
+      const compareceram = agendados * s.show;
+      const vendas       = compareceram * s.conv;
+      const fatur        = vendas * s.ticket;
 
-      // Calcula o necessário "para trás" no funil
-      const showups      = safeDiv(vendas, s.conv);
-      const agendamentos = safeDiv(showups, s.show);
-      const topo         = safeDiv(agendamentos, s.ag);
-
-      // Faturamento
-      const fatur = vendas * s.ticket;
-
-      return { fatur, topo, agendamentos, showups, vendas };
+      return { agendados, compareceram, vendas, fatur };
     }
 
     function renderResults(r){
-      $("rFat").textContent  = fmtBRL(r.fatur);
-      $("rTopo").textContent = fmtInt(Math.ceil(r.topo));
+      $("rFat").textContent = fmtBRL(r.fatur);
 
+      // detalhamento (igual ao print, simples e útil)
       $("rDetalhes").innerHTML =
-        `Agendamentos necessários: <strong>${fmtInt(Math.ceil(r.agendamentos))}</strong><br>` +
-        `Comparecimentos necessários: <strong>${fmtInt(Math.ceil(r.showups))}</strong><br>` +
-        `Vendas (clientes ideal): <strong>${fmtInt(Math.ceil(r.vendas))}</strong>`;
+        `Agendados: <strong>${fmtInt(r.agendados)}</strong><br>` +
+        `Compareceram: <strong>${fmtInt(r.compareceram)}</strong><br>` +
+        `Vendas: <strong>${fmtInt(r.vendas)}</strong>`;
     }
 
     function update(){
