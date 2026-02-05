@@ -20,12 +20,11 @@
       --shadow: 0 18px 40px rgba(0,0,0,.35);
       --radius: 16px;
 
-      --scribble-bg: rgba(255,255,255,.92);
-      --scribble-ink: #0b0b0b;
+      --boxWhite: rgba(255,255,255,.92);
+      --boxInk: #0b0b0b;
     }
 
     *{box-sizing:border-box}
-
     body{
       margin:0;
       font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, "Helvetica Neue";
@@ -34,7 +33,7 @@
         radial-gradient(800px 500px at 80% 20%, rgba(176,26,226,.18), transparent 55%),
         var(--bg);
       color:var(--text);
-      font-weight: 400;
+      font-weight: 300;
     }
 
     .wrap{
@@ -72,17 +71,17 @@
     }
 
     .title{
-      font-size: 18px;
-      font-weight: 500; /* mais fino */
+      font-size: 16px;
+      font-weight: 500;
       margin: 0 0 10px;
       letter-spacing:.2px;
     }
     .subtitle{
       margin: 0 0 18px;
-      color: rgba(244,241,255,.80);
-      font-size: 13px;
-      line-height: 1.35;
-      font-weight: 400;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.4;
+      font-weight: 300;
     }
 
     .row{
@@ -100,16 +99,15 @@
       margin-bottom: 10px;
     }
     .label{
-      font-weight: 500; /* mais fino */
-      font-size: 13px;
+      font-weight: 400;
+      font-size: 12px;
       letter-spacing:.2px;
     }
     .val{
       font-variant-numeric: tabular-nums;
-      font-weight: 500; /* mais fino */
-      font-size: 13px;
-      color: #fff;
-      opacity:.92;
+      font-weight: 400;
+      font-size: 12px;
+      color: rgba(255,255,255,.92);
       padding: 6px 10px;
       border-radius: 999px;
       background: rgba(255,255,255,.08);
@@ -128,90 +126,79 @@
     }
     .resultsHeader h2{
       margin:0;
-      font-size: 18px;
-      font-weight: 600; /* mais fino */
-      letter-spacing:.25px;
+      font-size: 14px;
+      font-weight: 500;
+      letter-spacing:.22em;
+      opacity:.95;
     }
 
-    /* ====== “FAIXAS” (direita) com mesma fonte do resto ====== */
-    .scribbleStack{
-      margin-top: 18px;
-      padding: 8px 6px 4px;
+    /* ====== BLOCO DIREITA (clean / minimalista) ====== */
+    .stack{
+      margin-top: 14px;
+      display:flex;
+      flex-direction:column;
+      gap: 12px; /* espaçamento entre as caixas */
     }
 
-    .scribbleRow{
-      position: relative;
+    .metric{
       display:flex;
       align-items:center;
-      justify-content:flex-end; /* sem texto, só número */
-      padding: 18px 18px;
-      margin: 16px 0;
-      border-radius: 12px;
-      background: var(--scribble-bg);
-      color: var(--scribble-ink);
-      overflow:hidden;
-    }
-
-    /* “borda rabiscada” minimalista */
-    .scribbleRow::before,
-    .scribbleRow::after{
-      content:"";
-      position:absolute;
-      inset: -6px;
+      justify-content:space-between;
+      gap: 12px;
+      padding: 14px 14px;
       border-radius: 14px;
-      pointer-events:none;
-      border: 2px solid rgba(0,0,0,.85);
-      opacity:.85;
-      transform: rotate(-0.4deg);
-    }
-    .scribbleRow::after{
-      inset: -10px -8px -8px -10px;
-      border-width: 2px;
-      opacity:.50;
-      transform: rotate(0.6deg);
+      background: var(--boxWhite);
+      color: var(--boxInk);
+      border: 1px solid rgba(0,0,0,.12);
+      box-shadow: 0 10px 22px rgba(0,0,0,.12);
     }
 
-    /* textura leve */
-    .scribbleRow .hatch{
-      position:absolute;
-      inset:0;
-      background:
-        repeating-linear-gradient(
-          -8deg,
-          rgba(0,0,0,.05) 0px,
-          rgba(0,0,0,.05) 2px,
-          transparent 2px,
-          transparent 16px
-        );
-      opacity:.22;
-      pointer-events:none;
-      mix-blend-mode:multiply;
+    .metric .k{
+      font-size: 13px;
+      font-weight: 300; /* mais fino */
+      letter-spacing:.2px;
+      color: rgba(0,0,0,.88);
     }
 
-    .scribbleValue{
-      z-index: 2;
+    .metric .v{
+      font-size: 13px;
+      font-weight: 400; /* ainda leve */
       font-variant-numeric: tabular-nums;
-      font-weight: 500;          /* mais fino */
-      font-size: 34px;           /* minimalista */
-      letter-spacing: .2px;
-      color: #0b0b0b;
-      white-space: nowrap;
+      color: rgba(0,0,0,.92);
+      white-space:nowrap;
     }
 
-    .scribbleRow.ok{
+    .metric.ok{
       background: rgba(86,224,107,.92);
+      border-color: rgba(0,0,0,.12);
       color: var(--okText);
     }
-    .scribbleRow.ok .scribbleValue{
-      color: #061B0C;
-      font-weight: 600; /* só um pouco mais forte no faturamento */
+    .metric.ok .k,
+    .metric.ok .v{
+      color: var(--okText);
     }
-    .scribbleRow.ok .hatch{ opacity:.16; }
+
+    /* detalhes do funil (esquerda, embaixo) */
+    .tiny{
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.35;
+      margin-top: 10px;
+      opacity:.95;
+      font-weight: 300;
+    }
+    .footerNote{
+      margin-top: 10px;
+      font-size: 12px;
+      color: rgba(255,255,255,.72);
+      line-height: 1.4;
+      font-weight: 300;
+    }
 
     @media (max-width: 920px){
       .grid{ grid-template-columns: 1fr; }
       .logo img{ height: 42px; }
-      .scribbleValue{ font-size: 30px; }
+      .metric .k, .metric .v{ font-size: 12px; }
     }
   </style>
 </head>
@@ -229,9 +216,7 @@
       <!-- ESQUERDA -->
       <section class="card">
         <h1 class="title">Calculadora de Funil</h1>
-        <p class="subtitle">
-          Ajuste as barrinhas. O faturamento recalcula automaticamente.
-        </p>
+        
 
         <div class="row">
           <div class="rowTop">
@@ -272,6 +257,10 @@
           </div>
           <input id="ticket" type="range" min="100" max="50000" step="100" value="2000">
         </div>
+
+        <div class="tiny">
+          <div class="footerNote" id="rDetalhes"></div>
+        </div>
       </section>
 
       <!-- DIREITA -->
@@ -280,29 +269,25 @@
           <h2>RESULTADO MENSAL</h2>
         </div>
 
-        <div class="scribbleStack">
-          <!-- Agendados (sem texto) -->
-          <div class="scribbleRow" aria-label="Agendados">
-            <div class="hatch"></div>
-            <div class="scribbleValue" id="rAg">0</div>
+        <div class="stack">
+          <div class="metric">
+            <div class="k">Agendados</div>
+            <div class="v" id="rAg">0</div>
           </div>
 
-          <!-- Compareceram (sem texto) -->
-          <div class="scribbleRow" aria-label="Compareceram">
-            <div class="hatch"></div>
-            <div class="scribbleValue" id="rShow">0</div>
+          <div class="metric">
+            <div class="k">Compareceram</div>
+            <div class="v" id="rShow2">0</div>
           </div>
 
-          <!-- Vendas (sem texto) -->
-          <div class="scribbleRow" aria-label="Vendas">
-            <div class="hatch"></div>
-            <div class="scribbleValue" id="rVendas">0</div>
+          <div class="metric">
+            <div class="k">Vendas</div>
+            <div class="v" id="rVendas">0</div>
           </div>
 
-          <!-- Faturamento (verde, sem texto) -->
-          <div class="scribbleRow ok" aria-label="Faturamento">
-            <div class="hatch"></div>
-            <div class="scribbleValue" id="rFat">R$ 0,00</div>
+          <div class="metric ok">
+            <div class="k">Faturamento</div>
+            <div class="v" id="rFat">R$ 0,00</div>
           </div>
         </div>
       </aside>
@@ -350,10 +335,15 @@
     }
 
     function renderResults(r){
-      $("rAg").textContent     = fmtInt(r.agendados);
-      $("rShow").textContent   = fmtInt(r.compareceram);
-      $("rVendas").textContent = fmtInt(r.vendas);
-      $("rFat").textContent    = fmtBRL(r.fatur);
+      $("rAg").textContent      = fmtInt(r.agendados);
+      $("rShow2").textContent   = fmtInt(r.compareceram);
+      $("rVendas").textContent  = fmtInt(r.vendas);
+      $("rFat").textContent     = fmtBRL(r.fatur);
+
+      $("rDetalhes").innerHTML =
+        `Agendados: <strong>${fmtInt(r.agendados)}</strong><br>` +
+        `Compareceram: <strong>${fmtInt(r.compareceram)}</strong><br>` +
+        `Vendas: <strong>${fmtInt(r.vendas)}</strong>`;
     }
 
     function update(){
