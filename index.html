@@ -340,11 +340,7 @@
       $("rVendas").textContent  = fmtInt(r.vendas);
       $("rFat").textContent     = fmtBRL(r.fatur);
 
-      $("rDetalhes").innerHTML =
-        `Agendados: <strong>${fmtInt(r.agendados)}</strong><br>` +
-        `Compareceram: <strong>${fmtInt(r.compareceram)}</strong><br>` +
-        `Vendas: <strong>${fmtInt(r.vendas)}</strong>`;
-    }
+       }
 
     function update(){
       const s = read();
