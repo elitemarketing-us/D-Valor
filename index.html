@@ -7,37 +7,36 @@
 
   <style>
     :root{
-      /* Cores base (mantendo a estética do print) */
       --bg: #0F0815;
-      --panel: #140B1F;
-      --panel2:#1B1028;
       --stroke: rgba(255,255,255,.10);
       --text: #F4F1FF;
       --muted:#CFC6EA;
 
       --brand: #8D0EB7;
-      --brand2:#B01AE2;
-      --track: rgba(255,255,255,.16);
 
-      --ok: #BFF3CF;
-      --okText: #0C2A16;
+      --ok: #56E06B;
+      --okText: #061B0C;
 
       --shadow: 0 18px 40px rgba(0,0,0,.35);
       --radius: 16px;
+
+      --scribble-bg: rgba(255,255,255,.90);
+      --scribble-ink: #0a0a0a;
     }
 
     *{box-sizing:border-box}
     body{
       margin:0;
       font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, "Helvetica Neue";
-      background: radial-gradient(900px 600px at 20% 10%, rgba(141,14,183,.25), transparent 60%),
-                  radial-gradient(800px 500px at 80% 20%, rgba(176,26,226,.18), transparent 55%),
-                  var(--bg);
+      background:
+        radial-gradient(900px 600px at 20% 10%, rgba(141,14,183,.25), transparent 60%),
+        radial-gradient(800px 500px at 80% 20%, rgba(176,26,226,.18), transparent 55%),
+        var(--bg);
       color:var(--text);
     }
 
     .wrap{
-      max-width: 1100px;
+      max-width: 1200px;
       margin: 24px auto;
       padding: 0 16px 40px;
     }
@@ -46,17 +45,9 @@
       display:flex;
       align-items:center;
       justify-content:flex-end;
-      gap:12px;
       margin-bottom:14px;
     }
 
-    .logo{
-      display:flex;
-      align-items:center;
-      justify-content:flex-end;
-      gap:10px;
-      min-width: 180px;
-    }
     .logo img{
       height: 46px;
       width:auto;
@@ -129,11 +120,7 @@
     }
 
     .resultsHeader{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:10px;
-      margin-bottom: 10px;
+      margin-bottom: 12px;
     }
     .resultsHeader h2{
       margin:0;
@@ -142,33 +129,96 @@
       letter-spacing:.25px;
     }
 
-    .kpi{
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      gap:12px;
-      padding: 14px 14px;
-      border-radius: var(--radius);
-      border: 1px solid var(--stroke);
-      background: rgba(255,255,255,.05);
-      margin: 12px 0;
-    }
-    .kpi strong{
-      font-size: 13px;
-      letter-spacing:.2px;
-    }
-    .kpi .num{
-      font-variant-numeric: tabular-nums;
-      font-weight: 950;
-      font-size: 16px;
+    /* ====== BLOCO RABISCADO (direita) ====== */
+    .scribbleStack{
+      margin-top: 18px;
+      padding: 8px 6px 4px;
     }
 
-    .kpi.ok{
-      background: var(--ok);
-      border-color: rgba(0,0,0,.08);
+    .scribbleRow{
+      position: relative;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap: 12px;
+      padding: 18px 18px;
+      margin: 16px 0;
+      border-radius: 12px;
+      background: var(--scribble-bg);
+      color: #0b0b0b;
+      overflow:hidden;
+    }
+
+    /* “rabisco” em volta (duas camadas) */
+    .scribbleRow::before,
+    .scribbleRow::after{
+      content:"";
+      position:absolute;
+      inset: -6px;
+      border-radius: 14px;
+      pointer-events:none;
+      border: 3px solid rgba(0,0,0,.90);
+      opacity:.9;
+      transform: rotate(-0.6deg);
+    }
+    .scribbleRow::after{
+      inset: -10px -8px -8px -10px;
+      border-width: 2px;
+      opacity:.55;
+      transform: rotate(0.9deg);
+    }
+
+    /* “riscos” internos para parecer escrito em quadro */
+    .scribbleRow .hatch{
+      position:absolute;
+      inset:0;
+      background:
+        repeating-linear-gradient(
+          -8deg,
+          rgba(0,0,0,.06) 0px,
+          rgba(0,0,0,.06) 2px,
+          transparent 2px,
+          transparent 14px
+        );
+      opacity:.35;
+      pointer-events:none;
+      mix-blend-mode:multiply;
+    }
+
+    .scribbleLabel{
+      font-family: "Comic Sans MS", "Bradley Hand", "Segoe Print", system-ui, sans-serif;
+      font-size: 42px;
+      line-height: 1;
+      letter-spacing: .2px;
+      color: #0b0b0b;
+      text-transform: none;
+      z-index: 2;
+    }
+    .scribbleValue{
+      font-family: "Comic Sans MS", "Bradley Hand", "Segoe Print", system-ui, sans-serif;
+      font-size: 42px;
+      line-height: 1;
+      letter-spacing: .2px;
+      color: #0b0b0b;
+      z-index: 2;
+      font-variant-numeric: tabular-nums;
+      padding-left: 10px;
+      white-space: nowrap;
+    }
+
+    .scribbleRow.ok{
+      background: rgba(86,224,107,.92);
       color: var(--okText);
     }
+    .scribbleRow.ok .scribbleLabel,
+    .scribbleRow.ok .scribbleValue{
+      color: #061B0C;
+    }
+    .scribbleRow.ok .hatch{
+      opacity:.22;
+    }
 
+    /* detalhes do funil (esquerda, embaixo) */
     .tiny{
       color: var(--muted);
       font-size: 12px;
@@ -176,7 +226,6 @@
       margin-top: 10px;
       opacity:.95;
     }
-
     .footerNote{
       margin-top: 10px;
       font-size: 12px;
@@ -186,8 +235,8 @@
 
     @media (max-width: 920px){
       .grid{ grid-template-columns: 1fr; }
-      .logo{ min-width:auto; }
       .logo img{ height: 42px; }
+      .scribbleLabel, .scribbleValue{ font-size: 36px; }
     }
   </style>
 </head>
@@ -202,7 +251,7 @@
     </div>
 
     <div class="grid">
-      <!-- CONTROLES -->
+      <!-- ESQUERDA -->
       <section class="card">
         <h1 class="title">Calculadora de Funil</h1>
         <p class="subtitle">
@@ -212,9 +261,9 @@
         <div class="row">
           <div class="rowTop">
             <div class="label">N° de clientes ideal</div>
-            <div class="val" id="vClientes">10</div>
+            <div class="val" id="vClientes">200</div>
           </div>
-          <input id="clientes" type="range" min="0" max="2000" step="10" value="200">
+          <input id="clientes" type="range" min="0" max="1000" step="10" value="200">
         </div>
 
         <div class="row">
@@ -246,7 +295,7 @@
             <div class="label">Ticket médio</div>
             <div class="val" id="vTicket">R$ 2.000,00</div>
           </div>
-          <input id="ticket" type="range" min="100" max="50000" step="100" value="2000">
+          <input id="ticket" type="range" min="100" max="10000" step="100" value="2000">
         </div>
 
         <div class="tiny">
@@ -254,15 +303,36 @@
         </div>
       </section>
 
-      <!-- RESULTADOS -->
+      <!-- DIREITA -->
       <aside class="card">
         <div class="resultsHeader">
           <h2>RESULTADO MENSAL</h2>
         </div>
 
-        <div class="kpi ok">
-          <strong>Faturamento</strong>
-          <div class="num" id="rFat">R$ 0,00</div>
+        <div class="scribbleStack">
+          <div class="scribbleRow">
+            <div class="hatch"></div>
+            <div class="scribbleLabel">Agendados</div>
+            <div class="scribbleValue" id="rAg">0</div>
+          </div>
+
+          <div class="scribbleRow">
+            <div class="hatch"></div>
+            <div class="scribbleLabel">Compareceram</div>
+            <div class="scribbleValue" id="rShow">0</div>
+          </div>
+
+          <div class="scribbleRow">
+            <div class="hatch"></div>
+            <div class="scribbleLabel">Vendas</div>
+            <div class="scribbleValue" id="rVendas">0</div>
+          </div>
+
+          <div class="scribbleRow ok">
+            <div class="hatch"></div>
+            <div class="scribbleLabel">Faturamento</div>
+            <div class="scribbleValue" id="rFat">R$ 0,00</div>
+          </div>
         </div>
       </aside>
     </div>
@@ -301,20 +371,21 @@
     }
 
     function calc(s){
-      // Funil:
-      // prospectados -> agendados -> compareceram -> compraram -> faturamento
-      const agendados    = s.prospect * s.ag;
-      const compareceram = agendados * s.show;
-      const vendas       = compareceram * s.conv;
+      // Arredondando em CADA etapa para ficar igual ao exemplo do print
+      const agendados    = Math.round(s.prospect * s.ag);
+      const compareceram = Math.round(agendados * s.show);
+      const vendas       = Math.round(compareceram * s.conv);
       const fatur        = vendas * s.ticket;
 
       return { agendados, compareceram, vendas, fatur };
     }
 
     function renderResults(r){
-      $("rFat").textContent = fmtBRL(r.fatur);
+      $("rAg").textContent     = fmtInt(r.agendados);
+      $("rShow").textContent   = fmtInt(r.compareceram);
+      $("rVendas").textContent = fmtInt(r.vendas);
+      $("rFat").textContent    = fmtBRL(r.fatur);
 
-      // detalhamento (igual ao print, simples e útil)
       $("rDetalhes").innerHTML =
         `Agendados: <strong>${fmtInt(r.agendados)}</strong><br>` +
         `Compareceram: <strong>${fmtInt(r.compareceram)}</strong><br>` +
